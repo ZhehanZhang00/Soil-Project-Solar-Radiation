@@ -75,5 +75,5 @@ Stations are sorted by total anomaly records.
 | Detailed anomaly summary | anomaly_tables/combined_anomaly_summary.csv | 10,776 continuous anomaly periods |
 | Distribution figure | Cleaned_Data/anomaly_distribution_by_dataset.png | Stacked count/rate chart |
 
-
+### Anomaly Distribution
 <img width="2400" height="1350" alt="anomaly_distribution_by_dataset" src="https://github.com/user-attachments/assets/1724b62d-c578-48f2-bc42-50979e03e07c" />
