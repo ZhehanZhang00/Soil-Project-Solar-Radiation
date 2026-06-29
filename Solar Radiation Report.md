@@ -56,7 +56,7 @@ Generated from the combined anomaly summary CSVs in this report.
 
 Stations are sorted by total anomaly records.
 
-| Station | Cleaned rows | Total anomaly records | % records anomalous | Daytime low | Night-time | Missing/gap | Spike/range | First anomaly | Last anomaly |
+| Station | Unique timestamp records | Total anomaly records | % records anomalous | Daytime low | Night-time | Missing/gap | Spike/range | First anomaly | Last anomaly |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | CB04 | 99,010 | 5,992 | 6.052% | 5,451 | 298 | 192 | 51 | 2014-11-13 19:00:00 | 2026-02-24 08:00:00 |
 | WC05 | 97,131 | 5,345 | 5.503% | 2,743 | 549 | 2,000 | 53 | 2014-11-13 19:00:00 | 2026-02-23 19:00:00 |
