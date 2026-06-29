@@ -1,4 +1,4 @@
-# Solar Radiation Anomaly QC: Output Guide
+# Solar Radiation Anomaly Clean Up Report
 
 This document explains the output from running `Solar Radiation Data Cleanup.py` on the six met-station solar radiation files.
 
