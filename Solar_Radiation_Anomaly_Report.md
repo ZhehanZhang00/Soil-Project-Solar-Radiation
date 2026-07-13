@@ -100,4 +100,4 @@ Recommended safeguards for any later imputation:
 | Station summaries | prewashed_anomaly_outputs/tables/*_simplified_anomaly_summary.csv | One row per station and major QC/event category |
 | Combined simplified summary | prewashed_anomaly_outputs/tables/combined_simplified_anomaly_summary.csv | 30 rows |
 | Combined detailed summary | prewashed_anomaly_outputs/tables/combined_detailed_anomaly_summary.csv | 9,756 continuous anomaly periods |
-| Distribution figure | prewashed_anomaly_outputs/anomaly_distribution_by_dataset.png | Stacked QC/event count and rate chart |
+| Distribution figure | prewashed_anomaly_outputs/anomaly_distribution_by_dataset.png | Stacked correction-target QC anomaly count and rate chart |
