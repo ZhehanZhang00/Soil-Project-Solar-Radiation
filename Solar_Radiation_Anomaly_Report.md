@@ -10,7 +10,7 @@ This report is generated from `prewashed_met_data/*_met.csv`. Compared with the 
 
 **Pass three - daylight context.** Station latitude/longitude and `America/Chicago` sunrise/sunset times are used to separate daytime and night-time records with a 30-minute buffer.
 
-**Pass four - anomaly marking.** The script marks night-time radiation, long daytime near-zero runs, sudden drops, possible weather-related low radiation, missing `Srad`, sudden spikes, and physical out-of-range values. No imputation is performed.
+**Pass four - QC and event marking.** The script marks correction-target QC anomalies separately from weather-related low-radiation events. Low `Srad` with precipitation in the current/recent hours or RH >= 95% is treated as a weather-related event, not as a value to automatically correct. No imputation is performed.
 
 **Pass five - reporting.** It writes row-level marked files, station-level summary tables, a combined detailed table, and the anomaly distribution figure.
 
@@ -27,59 +27,63 @@ This report is generated from `prewashed_met_data/*_met.csv`. Compared with the 
 | FD03 | 86,211 | 86,211 | 0 | 0 | 0 | 0 | 1.12e+03 |
 | WC05 | 98,902 | 98,902 | 0 | 0 | 2,020 | 0 | 1.18e+03 |
 
-## Anomaly Statistics
+## QC Flag and Weather-Event Statistics
 
 ### Overall
 
 - **Files scanned:** 6 prewashed met station files
 - **Prewashed records across all files:** 474,127
-- **Anomaly records logged:** 18,117 (**3.82%** of prewashed records)
-- **Continuous anomaly periods logged:** 9,368
-- **Stations with at least one anomaly:** 6 of 6
+- **Correction-target QC anomaly records:** 5,986 (**1.26%** of prewashed records)
+- **Weather-related low-radiation event records:** 13,508
+- **All flagged records/events:** 19,494 (**4.11%** of prewashed records)
+- **Continuous QC/event periods logged:** 9,756
+- **Stations with at least one QC flag/event:** 6 of 6
 
-### Major anomaly categories
+### Major QC and event categories
 
-| Category | Included detailed types | Records | % of anomalies | Stations affected | Treatment |
+| Category | Included detailed types | Records | % of flags/events | Stations affected | Treatment |
 | --- | --- | --- | --- | --- | --- |
-| Daytime low-radiation anomaly | Long daytime zero/near-zero run; Sudden radiation drop; Possible weather-related low radiation | 13,420 | 74.1% | 6 / 6 | Flag for review. Do not impute weather-supported low radiation by default. |
-| Night-time radiation anomaly | Night-time radiation anomaly | 2,198 | 12.1% | 6 / 6 | Flag for review. Candidate for setting to 0 or NA after confirmation. |
-| Missing Srad/timestamp anomaly | Missing Srad value; Timestamp gap | 2,257 | 12.5% | 4 / 6 | Flag as missing. Candidate for solar-aware imputation after review. |
-| Spike/out-of-range radiation anomaly | Sudden radiation spike; Out-of-range value | 242 | 1.3% | 6 / 6 | Flag for review. Candidate for replacement before imputation. |
+| Unexplained daytime low-radiation anomaly | Unexplained long daytime zero/near-zero run; Unexplained sudden radiation drop | 1,289 | 6.6% | 6 / 6 | Flag for review. Candidate for imputation only after sensor/weather review. |
+| Night-time radiation anomaly | Night-time radiation anomaly | 2,198 | 11.3% | 6 / 6 | Flag for review. Candidate for setting to 0 or NA after confirmation. |
+| Missing Srad/timestamp anomaly | Missing Srad value; Timestamp gap | 2,257 | 11.6% | 4 / 6 | Flag as missing. Candidate for solar-aware imputation after review. |
+| Spike/out-of-range radiation anomaly | Sudden radiation spike; Out-of-range value | 242 | 1.2% | 6 / 6 | Flag for review. Candidate for replacement before imputation. |
+| Weather-related low-radiation event | Weather-related low-radiation event | 13,508 | 69.3% | 6 / 6 | Advisory only. Retain by default because low Srad is weather-explained. |
 
-### Detailed anomaly types
+### Detailed QC/event types
 
-| Detailed anomaly type | Periods/runs | Records | Treatment |
+| Detailed type | Periods/runs | Records | Treatment |
 | --- | --- | --- | --- |
-| Possible weather-related low radiation | 6,008 | 11,440 | Flagged with precipitation or high-RH context; usually retain. |
+| Weather-related low-radiation event | 6,600 | 13,508 | Advisory only; precipitation/recent precipitation or high RH explains low Srad. |
 | Missing Srad value | 300 | 2,257 | Flagged as missing; candidate for imputation. |
 | Night-time radiation anomaly | 2,190 | 2,198 | Flagged; no imputation applied. |
-| Long daytime zero/near-zero run | 394 | 1,788 | Flagged; retain if weather or sensor context supports it. |
+| Unexplained long daytime zero/near-zero run | 234 | 1,100 | Flagged as suspicious; candidate for review/imputation. |
 | Sudden radiation spike | 242 | 242 | Flagged; candidate for replacement before imputation. |
-| Sudden radiation drop | 234 | 234 | Flagged; no imputation applied. |
+| Unexplained sudden radiation drop | 190 | 190 | Flagged as suspicious; candidate for review/imputation. |
 
 ### Per-station
 
-Stations are sorted by total anomaly records.
+Stations are sorted by total flagged records/events.
 
-| Station | Prewashed rows | Total anomaly records | % records anomalous | Daytime low | Night-time | Missing Srad/gap | Spike/range | First anomaly | Last anomaly |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| WC05 | 98,902 | 5,364 | 5.424% | 2,743 | 549 | 2,020 | 52 | 2014-11-13 19:00:00 | 2026-02-23 19:00:00 |
-| CB04 | 98,907 | 4,440 | 4.489% | 3,860 | 298 | 232 | 50 | 2014-11-13 19:00:00 | 2026-02-22 19:00:00 |
-| FD02 | 99,914 | 3,836 | 3.839% | 3,335 | 452 | 1 | 48 | 2014-10-03 07:00:00 | 2026-02-23 19:00:00 |
-| CB06 | 74,596 | 2,139 | 2.867% | 1,681 | 419 | 4 | 35 | 2017-02-04 08:00:00 | 2025-08-02 15:00:00 |
-| FD03 | 86,211 | 1,842 | 2.137% | 1,410 | 381 | 0 | 51 | 2016-04-27 07:00:00 | 2026-02-23 19:00:00 |
-| CB01 | 15,597 | 496 | 3.180% | 391 | 99 | 0 | 6 | 2022-06-09 06:00:00 | 2024-03-18 07:00:00 |
+| Station | Prewashed rows | All flags/events | Correction-target QC anomalies | % records needing review | Unexplained low | Night-time | Missing Srad/gap | Spike/range | Weather event | First flag/event | Last flag/event |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| WC05 | 98,902 | 5,601 | 2,711 | 2.741% | 90 | 549 | 2,020 | 52 | 2,890 | 2014-11-13 19:00:00 | 2026-02-23 19:00:00 |
+| CB04 | 98,907 | 4,691 | 1,601 | 1.619% | 1,021 | 298 | 232 | 50 | 3,090 | 2014-11-13 19:00:00 | 2026-02-22 19:00:00 |
+| FD02 | 99,914 | 4,138 | 639 | 0.640% | 138 | 452 | 1 | 48 | 3,499 | 2014-10-03 07:00:00 | 2026-02-23 19:00:00 |
+| CB06 | 74,596 | 2,358 | 469 | 0.629% | 11 | 419 | 4 | 35 | 1,889 | 2017-02-04 08:00:00 | 2025-08-02 19:00:00 |
+| FD03 | 86,211 | 2,183 | 452 | 0.524% | 20 | 381 | 0 | 51 | 1,731 | 2016-04-27 07:00:00 | 2026-02-23 19:00:00 |
+| CB01 | 15,597 | 523 | 114 | 0.731% | 9 | 99 | 0 | 6 | 409 | 2022-06-09 06:00:00 | 2024-03-18 07:00:00 |
 
 ## Imputation Plan Not Yet Applied
 
-The script only marks anomalous `Srad` values. Imputation should be a separate downstream step so the original prewashed observations and QC flags remain auditable.
+The script only marks QC anomalies and weather-related events. Imputation should be a separate downstream step so the original prewashed observations and QC flags remain auditable.
 
 | Anomaly class | Suggested imputation decision |
 |---|---|
 | Night-time radiation anomaly | If confirmed as sensor offset/noise, replace with 0 for radiation-balance workflows or set to NA for conservative analyses. Keep an imputation flag. |
 | Missing Srad value or timestamp gap | For short gaps, use solar-aware interpolation constrained by hour-of-day and daylight/night status. For longer gaps, use seasonal/hourly climatology, nearby stations, or a model using `Rso`, `Tair`, `RH`, `Ppt`, and wind variables. |
 | Spike/out-of-range radiation anomaly | Treat as invalid first, then impute using neighboring hours/stations or a clear-sky-constrained model. |
-| Daytime low-radiation anomaly | Do not automatically impute if precipitation or high RH supports cloudy/rainy conditions. Only impute sustained zero/near-zero runs after sensor-failure review. |
+| Unexplained daytime low-radiation anomaly | Impute only after checking sensor context and nearby stations. |
+| Weather-related low-radiation event | Do not impute by default; retain as a likely real cloudy/rainy/foggy condition. |
 
 Recommended safeguards for any later imputation:
 
@@ -92,8 +96,8 @@ Recommended safeguards for any later imputation:
 
 | Output | Path | Contents |
 | --- | --- | --- |
-| Marked prewashed data | prewashed_anomaly_outputs/marked_data/*_anomaly_marked.csv | Original columns plus Srad anomaly flags |
-| Station summaries | prewashed_anomaly_outputs/tables/*_simplified_anomaly_summary.csv | One row per station and major anomaly category |
-| Combined simplified summary | prewashed_anomaly_outputs/tables/combined_simplified_anomaly_summary.csv | 24 rows |
-| Combined detailed summary | prewashed_anomaly_outputs/tables/combined_detailed_anomaly_summary.csv | 9,368 continuous anomaly periods |
-| Distribution figure | prewashed_anomaly_outputs/anomaly_distribution_by_dataset.png | Stacked count/rate chart |
+| Marked prewashed data | prewashed_anomaly_outputs/marked_data/*_anomaly_marked.csv | Original columns plus Srad QC flags and weather-event labels |
+| Station summaries | prewashed_anomaly_outputs/tables/*_simplified_anomaly_summary.csv | One row per station and major QC/event category |
+| Combined simplified summary | prewashed_anomaly_outputs/tables/combined_simplified_anomaly_summary.csv | 30 rows |
+| Combined detailed summary | prewashed_anomaly_outputs/tables/combined_detailed_anomaly_summary.csv | 9,756 continuous anomaly periods |
+| Distribution figure | prewashed_anomaly_outputs/anomaly_distribution_by_dataset.png | Stacked QC/event count and rate chart |
